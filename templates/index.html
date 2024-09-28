@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block main %}
+<main class="flex">
+	<aside class="pt-4 flex-none w-72 bg-blue-200 h-screen flex flex-col items-center">
+		<h1 class="text-xl uppercase font-semibold pb-4">files</h1>
+		{% for i in selected.assets %}
+			<p data-tooltip="{{i['name']}}" class="text-center px-1 overflow-hidden text-ellipsis w-full whitespace-nowrap">{{i["name"]}}</p>
+		{% endfor %}
+		<a href="/well/{{selected.route}}/add-pdf" class="font-bold mt-4 py-2 px-4 rounded bg-blue-500 text-white hover:bg-blue-700">Add</a>
+	</aside>
+	<div class="flex-1">
+		<nav class="p-4 bg-blue-200 flex gap-2 items-center">
+			<p class="underline">Default well</p>
+			<button class="font-bold py-2 px-4 rounded bg-blue-500 text-white hover:bg-blue-700">New</button>
+		</nav>
+		<div>
+			<!-- Timeline goes here -->
+		</div>
+	</div>
+</main>
+{% endblock %}
