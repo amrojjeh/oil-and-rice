@@ -16,39 +16,6 @@ MAX_TOKENS = 7800
 tokenizer = tiktoken.encoding_for_model("gpt-4")
 
 
-def extract_text_from_pdfs(folder_path):
-    """
-    Extracts text from all PDF files in a folder using PyPDF2 and falls back to OCR if no text is extracted.
-    """
-    all_text = ""
-
-    for filename in os.listdir(folder_path):
-        if filename.endswith(".pdf"):
-            file_path = os.path.join(folder_path, filename)
-
-            with open(file_path, "rb") as file:
-                reader = PyPDF2.PdfReader(file)
-                num_pages = len(reader.pages)
-
-                for page_num in range(num_pages):
-                    page = reader.pages[page_num]
-                    text = page.extract_text()
-
-                    # If no text is extracted, attempt OCR
-                    if not text:
-                        print(f"No text extracted from {filename}, page {page_num + 1}, attempting OCR...")
-                        images = convert_from_path(file_path, first_page=page_num + 1, last_page=page_num + 1)
-                        for image in images:
-                            text = pytesseract.image_to_string(image)
-
-                    if text:
-                        all_text += text + "\n"
-                    else:
-                        print(f"OCR failed to extract text from {filename}, page {page_num + 1}")
-
-    return all_text
-
-
 def save_text_to_file(text, output_file):
     """
     Saves the extracted text to a file.
@@ -63,14 +30,6 @@ def read_text_from_file(file_path):
     """
     with open(file_path, "r", encoding="utf-8") as file:
         return file.read()
-
-
-def count_tokens(text):
-    """
-    Counts the number of tokens in the text using tiktoken.
-    """
-    return len(tokenizer.encode(text))
-
 
 def split_text_into_chunks(text, max_tokens):
     """
@@ -111,26 +70,6 @@ def send_to_openai_api(text_content):
     except Exception as e:
         print(f"Request failed: {e}")
         return None
-
-def final_question(sum_response):
-    try:
-        completion = client.chat.completions.create(
-            model="gpt-4",
-            messages=[
-                {"role": "system",
-                 "content": "You are a helpful assistant who has been provided with detailed information."},
-                {"role": "user", "content": "Could you summarize the dates and events that are important to the lifecycle of the well based on all the information. Please answer in json "},
-                {
-                    "role": "user",
-                    "content": sum_response
-                }
-            ],
-        )
-        return completion.choices[0].message.content
-    except Exception as e:
-        print(f"Request failed: {e}")
-        return None
-
 
 def getChatAnswer(folder_path,output_file):
 
